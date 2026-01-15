@@ -1,5 +1,3 @@
-it still refreshes:
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -7,10 +5,14 @@ it still refreshes:
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>ZKP Demo Frontend</title>
 		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
 			body {
 				font-family: Arial, sans-serif;
 				margin: 40px;
-				max-width: 500px;
 			}
 			label {
 				display: block;
@@ -29,26 +31,57 @@ it still refreshes:
 				background: #eee;
 				padding: 15px;
 				margin-top: 20px;
+				white-space: pre-wrap;
+				word-wrap: break-word;
+				overflow-wrap: break-word;
+				max-width: 100%;
+				box-sizing: border-box;
+			}
+
+			.container {
+				display: flex;
+				gap: 2rem;
+				flex-wrap: wrap;
+				width: 100%;
+			}
+
+			.form {
+				width: 320px;
+				flex-shrink: 0;
+			}
+
+			.result {
+				flex: 1 1 0%;
+				min-width: 320px;
 			}
 		</style>
 	</head>
 	<body>
-		<h1>ZKP Demo Frontend</h1>
+		<div class="container">
+			<div class="form">
+				<h2>Form</h2>
+				<form id="zkpForm">
+					<label>
+						Age:
+						<input type="number" id="age" name="age" required min="0" />
+					</label>
+					<label>
+						Balance:
+						<input type="number" id="balance" name="balance" required min="0" />
+					</label>
+					<button type="submit">Generate Proof & Access Resource</button>
+				</form>
+			</div>
 
-		<form id="zkpForm">
-			<label>
-				Age:
-				<input type="number" id="age" name="age" required min="0" />
-			</label>
-			<label>
-				Balance:
-				<input type="number" id="balance" name="balance" required min="0" />
-			</label>
-			<button type="submit">Generate Proof & Access Resource</button>
-		</form>
+			<div class="result">
+				<h2>Result</h2>
+				<pre id="result">
+This interface simulates a zero-knowledge proof (ZKP) generation process using your input data. By filling out the form with your age and balance, the system generates a proof that you meet certain conditions without revealing the exact details.
 
-		<h2>Result</h2>
-		<pre id="result"></pre>
+Note: In real-world applications, the data used for proof generation typically comes from dedicated, secure services or databases that verify user information. This demo form is only for simulation purposes and does not connect to any real data sources.</pre
+				>
+			</div>
+		</div>
 
 		<script src="app.js"></script>
 	</body>

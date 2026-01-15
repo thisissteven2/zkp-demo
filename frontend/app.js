@@ -1,6 +1,6 @@
 async function generateProof(age, balance) {
 	try {
-		const resp = await fetch("http://localhost:9000/generate-proof", {
+		const resp = await fetch("http://localhost:5003/generate-proof", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ age, balance }),
@@ -32,7 +32,7 @@ async function issueJWT(proof, publicSignals) {
 
 async function callProtectedService(accessToken) {
 	try {
-		const resp = await fetch("http://localhost:6000/access-resource", {
+		const resp = await fetch("http://localhost:5001/access-resource", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ token: accessToken }),
@@ -56,24 +56,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	form.addEventListener("submit", async (e) => {
 		e.preventDefault();
-		resultElem.textContent = "Working...";
+		resultElem.textContent = "Working...\n\n";
 
 		const age = parseInt(form.age.value, 10);
 		const balance = parseInt(form.balance.value, 10);
 
 		try {
 			// 1. Generate the zero-knowledge proof by calling your backend
+			resultElem.textContent += "Step 1: Generating zero-knowledge proof...\n\n";
 			const { proof, publicSignals } = await generateProof(age, balance);
 
+			resultElem.textContent += `Proof snippet:\n${JSON.stringify(proof.pi_a || proof, null, 2)}\n\n`;
+			resultElem.textContent += `Public signals:\n${JSON.stringify(publicSignals, null, 2)}\n\n`;
+
 			// 2. Call IdP to issue JWT token by verifying proof
+			resultElem.textContent += "Step 2: Requesting JWT token...\n\n";
 			const accessToken = await issueJWT(proof, publicSignals);
 
+			resultElem.textContent += `Access token:\n${accessToken}\n\n`;
+
 			// 3. Call protected service with JWT token
+			resultElem.textContent += "Step 3: Accessing protected resource with token...\n\n";
 			const protectedResult = await callProtectedService(accessToken);
 
-			// resultElem.textContent = JSON.stringify(protectedResult, null, 2);
+			const { status, issuer, issuedAt } = protectedResult;
+			resultElem.textContent += `Status: ${status}\nIssuer: ${issuer}\nIssued At: ${issuedAt}\n`;
 		} catch (error) {
-			resultElem.textContent = "Error: " + error.message;
+			resultElem.textContent += "Error: Failed to generate proof or access resource.\n\n";
+			resultElem.textContent += "Error details: " + error.message;
 		}
 	});
 });
