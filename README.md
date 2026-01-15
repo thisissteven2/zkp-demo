@@ -14,6 +14,12 @@ In real-world applications, the data for proof generation would come from secure
 
 ---
 
+## Setup Instructions
+
+For detailed setup and running instructions, please see the [Setup Guide](./setup.md).
+
+---
+
 ## How It Works
 
 1. **User Input**: The user enters their age and balance in the form.
