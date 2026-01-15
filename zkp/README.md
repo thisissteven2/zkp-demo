@@ -81,4 +81,8 @@ snarkjs groth16 verify \
   proof.json
 ```
 
+Still inside `./build` folder, copy the verification key to our `verification-service` folder:
 
+```bash
+cp verification_key.json ../../verification-service/
+```
