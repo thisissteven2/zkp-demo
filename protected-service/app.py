@@ -1,38 +1,30 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Header
+from jose import jwt, JWTError
 import time
 
 app = FastAPI(title="Protected Service")
 
-# ---- Request Model ----
-class AccessRequest(BaseModel):
-    proof: str
-    issued_at: int
+SECRET_KEY = "SUPER_SECRET_IDP_KEY"
+ALGORITHM = "HS256"
 
-# ---- Fake Proof Verifier ----
-def verify_fake_zkp(proof: str, issued_at: int) -> bool:
-    """
-    Simulates verification of a ZKP proof.
-    """
-    now = int(time.time())
-
-    # Reject old proofs (replay protection)
-    if now - issued_at > 60:
-        return False
-
-    # For now, any non-empty proof is considered valid
-    return len(proof) > 0
-
-
-# ---- Protected Endpoint ----
 @app.post("/access-resource")
-def access_resource(req: AccessRequest):
-    is_valid = verify_fake_zkp(req.proof, req.issued_at)
+def access_resource(authorization: str = Header(...)):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid auth header")
 
-    if not is_valid:
-        raise HTTPException(status_code=403, detail="Invalid or expired proof")
+    token = authorization.replace("Bearer ", "")
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError:
+        raise HTTPException(status_code=403, detail="Invalid token")
+
+    proof = payload.get("proof")
+    if not proof:
+        raise HTTPException(status_code=403, detail="Missing proof")
 
     return {
         "status": "ACCESS_GRANTED",
-        "message": "You may access the protected resource"
+        "issuer": payload.get("iss"),
+        "issued_at": payload.get("iat")
     }
