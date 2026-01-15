@@ -71,7 +71,7 @@ This script will:
 
 ## Step 4: Rebuild ZKP Artifacts (After Circuit Changes)
 
-If you make any changes to the ZKP circuit file zkp/circuit/age_balance.circom or related files, run the rebuild script to regenerate the ZKP build artifacts without reinstalling backend dependencies:
+If you make any changes to the ZKP circuit file `zkp/circuit/age_balance.circom` or related files, run the rebuild script to regenerate the ZKP build artifacts without reinstalling backend dependencies:
 
 ```bash
 ./rebuild-zkp.sh
@@ -86,4 +86,5 @@ This script will:
 
 - The mathematical constraint enforced is that the user must be at least 18 years old and have a balance greater than 1000. This constraint can be changed by editing `./zkp/circuit/age_balance.circom`.
 - The frontend runs as a static file (`index.html`), so no live server is needed. Make sure your browser allows JS requests to the backend services running on localhost.
+
 - To stop backend services, kill their running processes or close the terminal windows.
