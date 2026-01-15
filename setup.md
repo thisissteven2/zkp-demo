@@ -48,15 +48,11 @@ The script will:
 - Check if the ZKP build artifacts (`build` folder and required files) exist and are valid.
 - If missing or incomplete, it will run the necessary commands to compile the circuit, run the trusted setup, generate keys, and prepare everything for proof generation.
 - Set up and start all backend services.
+    - Enter each service folder (`proof-service`, `verification-service`, `identity-provider`, etc.).
+    - Create and activate a Python virtual environment (if not exists).
+    - Install Python dependencies from `requirements.txt`.
+    - Run the services with `uvicorn` on their respective ports.
 - Open the frontend `index.html` file in your default browser.
-
-## Step 3: Service Setup and Running
-
-The script will:
-- Enter each service folder (`proof-service`, `verification-service`, `identity-provider`, etc.).
-- Create and activate a Python virtual environment (if not exists).
-- Install Python dependencies from `requirements.txt`.
-- Run the services with `uvicorn` on their respective ports.
 
 ## Step 4: Access the Frontend
 
@@ -68,8 +64,8 @@ After all services are running, the script will open the frontend index.html fil
 
 - The mathematical constraint enforced is that the user must be at least 18 years old and have a balance greater than 1000. This constraint can be changed by making modifications to the file `./zkp/circuit/age_balance.circom`.
 - Ensure all services run on their respective ports:
-    - Identity Provider service: 5000
-    - Protected Resource service: 5001
-    - Verifier service: 5002
-    - Proof generation service: 5003
+    - Identity Provider service: `5000`
+    - Protected Resource service: `5001`
+    - Verifier service: `5002`
+    - Proof generation service: `5003`
 - If you make any changes in the zkp circuit or related files, rerun the setup script to rebuild.
