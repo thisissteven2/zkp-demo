@@ -4,7 +4,10 @@ set -e
 
 echo "Starting setup..."
 
-ZKP_DIR="./zkp"
+# Absolute path of the script directory (project root)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+ZKP_DIR="$SCRIPT_DIR/zkp"
 BUILD_DIR="$ZKP_DIR/build"
 PTAU_DIR="$ZKP_DIR/ptau"
 
@@ -38,47 +41,47 @@ function check_zkp() {
 function run_zkp_setup() {
   echo "Running ZKP setup..."
 
-  cd "$ZKP_DIR"
+  pushd "$ZKP_DIR" > /dev/null
 
   # Compile circuit
   echo "Compiling age_balance.circom..."
   circom circuit/age_balance.circom --r1cs --wasm --sym -l node_modules -o build
 
   # Setup ptau if not exists
-  if [ ! -f "$PTAU_DIR/pot12_0000.ptau" ]; then
-    mkdir -p "$PTAU_DIR"
-    cd "$PTAU_DIR"
+  if [ ! -f "ptau/pot12_0000.ptau" ]; then
+    mkdir -p ptau
+    pushd ptau > /dev/null
+
     echo "Generating initial Powers of Tau (pot12_0000.ptau)..."
     snarkjs powersoftau new bn128 12 pot12_0000.ptau -v
 
     echo "Contributing to Powers of Tau (pot12_final.ptau)..."
-    snarkjs powersoftau contribute pot12_0000.ptau pot12_final.ptau --name="Steven" -v
+    # Provide entropy automatically to avoid prompt
+    printf "Steven random entropy\n" | snarkjs powersoftau contribute pot12_0000.ptau pot12_final.ptau --name="Steven" -v
 
     echo "Verifying Powers of Tau..."
     snarkjs powersoftau verify pot12_final.ptau
 
-    cd ..
+    popd > /dev/null
   else
     echo "Powers of Tau already present."
   fi
 
-  # Prepare phase2
   echo "Preparing phase2 ptau file..."
   snarkjs powersoftau prepare phase2 ptau/pot12_final.ptau ptau/pot12_final_phase2.ptau
 
-  # Groth16 setup
   echo "Running Groth16 setup..."
   snarkjs groth16 setup build/age_balance.r1cs ptau/pot12_final_phase2.ptau build/age_balance_0000.zkey
 
-  # Contribute to zkey
   echo "Contributing to final zkey..."
   snarkjs zkey contribute build/age_balance_0000.zkey build/age_balance_final.zkey --name="Steven contribution" -e="random_entropy_123"
 
-  # Export verification key
   echo "Exporting verification key..."
   snarkjs zkey export verificationkey build/age_balance_final.zkey build/verification_key.json
 
-  # Create example input.json
+  echo "Copying verification_key.json to verifier-service..."
+  cp build/verification_key.json "$SCRIPT_DIR/verifier-service/"
+
   echo "Creating example input.json..."
   cat > build/input.json <<EOL
 {
@@ -89,7 +92,8 @@ function run_zkp_setup() {
 EOL
 
   echo "ZKP setup complete."
-  cd ..
+
+  popd > /dev/null
 }
 
 function setup_service() {
@@ -98,22 +102,23 @@ function setup_service() {
 
   echo "Setting up service in $SERVICE_DIR..."
 
-  cd "$SERVICE_DIR"
+  pushd "$SCRIPT_DIR/$SERVICE_DIR" > /dev/null
 
-  # Create virtual env if not exists
   if [ ! -d "venv" ]; then
     python3 -m venv venv
   fi
 
-  source venv/bin/activate
+  # Activate virtualenv cross-platform
+  if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    # Windows Git Bash or similar
+    source venv/Scripts/activate
+  else
+    # Unix/Linux/macOS
+    source venv/bin/activate
+  fi
 
   pip install --upgrade pip
   pip install -r requirements.txt
-
-  echo "Starting service on port $PORT..."
-  uvicorn app:app --port $PORT &
-
-  cd ..
 }
 
 echo "Checking ZKP build and keys..."
@@ -123,22 +128,10 @@ else
   echo "ZKP build already present, skipping setup."
 fi
 
-# Start backend services
+# Setup backend services
 setup_service "proof-service" 5003
-setup_service "identity-provider" 5000
-setup_service "verification-service" 5001
+setup_service "idp-service" 5000
+setup_service "verifier-service" 5001
+setup_service "protected-service" 5002
 
-# Open frontend in default browser (Linux/macOS)
-FRONTEND_PATH="$(pwd)/frontend/index.html"
-echo "Opening frontend: $FRONTEND_PATH"
-
-if which xdg-open > /dev/null; then
-  xdg-open "$FRONTEND_PATH"
-elif which open > /dev/null; then
-  open "$FRONTEND_PATH"
-else
-  echo "Please open frontend/index.html manually in your browser."
-fi
-
-echo "Setup complete. Backend services are running."
-echo "To stop services, kill their processes or close this terminal."
+echo "Setup complete. Backend services ready to run."
