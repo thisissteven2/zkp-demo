@@ -1,6 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import hashlib
+import requests
 import time
 from jose import jwt
 
@@ -10,28 +10,24 @@ SECRET_KEY = "SUPER_SECRET_IDP_KEY"
 ALGORITHM = "HS256"
 TOKEN_TTL = 60  # seconds
 
-
+VERIFIER_URL = "http://127.0.0.1:5002/verify-proof"
 class ProofRequest(BaseModel):
-    user_id: str
-    age: int
-    balance: int
+    proof: dict
+    public: list
 
+@app.post("/issue-token")
+def issue_token(req: ProofRequest):
+    resp = requests.post(VERIFIER_URL, json=req)
 
-def generate_fake_zkp(user_id: str, age: int, balance: int) -> str:
-    condition_met = (age >= 18) and (balance >= 1000)
-    payload = f"{user_id}|{condition_met}|{time.time()}"
-    return hashlib.sha256(payload.encode()).hexdigest()
+    if resp.status_code != 200:
+        raise HTTPException(status_code=403, detail="Invalid ZK proof")
 
-
-@app.post("/generate-proof")
-def generate_proof(req: ProofRequest):
-    proof = generate_fake_zkp(req.user_id, req.age, req.balance)
-
+    now = int(time.time())
     payload = {
-        "proof": proof,
-        "iat": int(time.time()),
-        "exp": int(time.time()) + TOKEN_TTL,
-        "iss": "idp-service"
+        "iss": "idp-service",
+        "iat": now,
+        "exp": now + TOKEN_TTL,
+        "scope": "age_balance_verified"
     }
 
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)

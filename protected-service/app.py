@@ -16,6 +16,12 @@ def access_resource(authorization: str = Header(...)):
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("iss") != "idp-service":
+          raise HTTPException(status_code=403, detail="Untrusted issuer")
+        
+        if payload.get("exp") < time.time():
+          raise HTTPException(status_code=403, detail="Token expired")
+
     except JWTError:
         raise HTTPException(status_code=403, detail="Invalid token")
 

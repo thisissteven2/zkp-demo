@@ -26,13 +26,8 @@ def verify_proof(req: ProofRequest):
             json.dump(req.public, f)
 
         result = subprocess.run(
-            [
-                "npx",
-                "snarkjs", "groth16", "verify",
-                "verification_key.json",
-                public_path,
-                proof_path
-            ],
+            "npx snarkjs groth16 verify verification_key.json "
+            f"{public_path} {proof_path}",
             capture_output=True,
             text=True,
             shell=True
