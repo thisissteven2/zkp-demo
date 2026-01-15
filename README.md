@@ -1,6 +1,6 @@
-# Zero-Knowledge Proof (ZKP) Demo Frontend
+# Zero-Knowledge Proof (ZKP) Demo
 
-This project is a simple web frontend demonstrating the flow of zero-knowledge proof generation and verification in a privacy-preserving authentication system.
+This project is a simple web frontend + microservices demonstrating the flow of zero-knowledge proof generation and verification in a privacy-preserving authentication system.
 
 ---
 
@@ -64,7 +64,4 @@ In real-world applications, the data for proof generation would come from secure
 This project is made as a final report submission for cryptography course @ustc's software engineering program.
 
 ---
-
-**Author:** Steven
-**Date:** January 2026
 
