@@ -1,1 +1,69 @@
-env
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.env
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# Node / ZKP tooling
+# =========================
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# snarkjs / circom generated artifacts
+*.r1cs
+*.wasm
+*.sym
+*.zkey
+*.wtns
+proof.json
+public.json
+verification_key.json
+
+# =========================
+# Cryptographic material
+# =========================
+*.pem
+*.key
+*.crt
+secrets/
+keys/
+jwt/*
+!jwt/.gitkeep
+*.secret
+
+# =========================
+# Docker
+# =========================
+*.log
+docker-compose.override.yml
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# =========================
+# Build / Cache
+# =========================
+dist/
+build/
+.cache/
+
+# =========================
+# Docs build output
+# =========================
+docs/_build/
