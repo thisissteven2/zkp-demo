@@ -22,14 +22,14 @@ After compiling the circuit into R1CS, a Groth16 trusted setup was performed. Th
 Complete commands run are as seen below:
 
 ```bash
-# under the current /zkp folder
+# under the /ptau folder
  snarkjs powersoftau new bn128 12 pot12_0000.ptau -v
  snarkjs powersoftau contribute pot12_0000.ptau pot12_final.ptau --name="Steven" -v
  snarkjs powersoftau verify pot12_final.ptau
 ```
 
 ```bash
-cd build
+cd ../build
 snarkjs powersoftau prepare phase2 \
    ../ptau/pot12_final.ptau \
    ../ptau/pot12_final_phase2.ptau
@@ -49,3 +49,36 @@ snarkjs zkey export verificationkey \
    age_balance_final.zkey \
    verification_key.json
 ```
+
+Still inside `./build` folder, create `input.json`:
+
+```json
+// Assertion will fail if age < 18 or balance < 1000
+{
+	"age": 22,
+	"balance": 5000,
+	"valid": 1
+}
+```
+
+Run the following commands to verify the proof:
+
+```bash
+node age_balance_js/generate_witness.js \
+  age_balance_js/age_balance.wasm \
+  input.json \
+  witness.wtns
+
+snarkjs groth16 prove \
+  age_balance_final.zkey \
+  witness.wtns \
+  proof.json \
+  public.json
+
+snarkjs groth16 verify \
+  verification_key.json \
+  public.json \
+  proof.json
+```
+
+

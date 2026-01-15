@@ -65,7 +65,7 @@ Thumbs.db
 # Build / Cache
 # =========================
 dist/
-# build/
+build/
 .cache/
 
 # =========================

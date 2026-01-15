@@ -7,25 +7,27 @@ template AgeBalance() {
     signal input age;
     signal input balance;
 
-    // Public outputs
-    signal output age_ok;
-    signal output balance_ok;
+    // Public claim
+    signal input valid;
 
-    // Check age >= 18
+    // Internal signals
+    signal age_ok;
+    signal balance_ok;
+
+    // age < 18 ?
     component ageCheck = LessThan(8);
     ageCheck.in[0] <== age;
     ageCheck.in[1] <== 18;
+    age_ok <== 1 - ageCheck.out;
 
-    // Check balance >= 1000
+    // balance < 1000 ?
     component balanceCheck = LessThan(32);
     balanceCheck.in[0] <== balance;
     balanceCheck.in[1] <== 1000;
-
-    // If age < 18, ageCheck.out = 1 → invalid
-    age_ok <== 1 - ageCheck.out;
-
-    // If balance < 1000, balanceCheck.out = 1 → invalid
     balance_ok <== 1 - balanceCheck.out;
+
+    // Enforce the claim
+    valid === age_ok * balance_ok;
 }
 
-component main = AgeBalance();
+component main { public [valid] } = AgeBalance();
