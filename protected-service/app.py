@@ -1,25 +1,38 @@
-from fastapi import FastAPI, Header, HTTPException
-import requests
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import time
 
-app = FastAPI()
+app = FastAPI(title="Protected Service")
 
-VERIFIER_URL = "http://localhost:6000/verify-proof"
+# ---- Request Model ----
+class AccessRequest(BaseModel):
+    proof: str
+    issued_at: int
 
-@app.post("/protected-action")
-def protected_action(authorization: str = Header(None)):
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Missing Authorization header")
+# ---- Fake Proof Verifier ----
+def verify_fake_zkp(proof: str, issued_at: int) -> bool:
+    """
+    Simulates verification of a ZKP proof.
+    """
+    now = int(time.time())
 
-    token = authorization.replace("Bearer ", "")
+    # Reject old proofs (replay protection)
+    if now - issued_at > 60:
+        return False
 
-    response = requests.post(
-        VERIFIER_URL,
-        json={"token": token}
-    )
+    # For now, any non-empty proof is considered valid
+    return len(proof) > 0
 
-    result = response.json()
 
-    if result.get("valid"):
-        return {"status": "access granted"}
-    else:
-        raise HTTPException(status_code=403, detail="Access denied")
+# ---- Protected Endpoint ----
+@app.post("/access-resource")
+def access_resource(req: AccessRequest):
+    is_valid = verify_fake_zkp(req.proof, req.issued_at)
+
+    if not is_valid:
+        raise HTTPException(status_code=403, detail="Invalid or expired proof")
+
+    return {
+        "status": "ACCESS_GRANTED",
+        "message": "You may access the protected resource"
+    }
