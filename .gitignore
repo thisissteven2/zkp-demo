@@ -14,6 +14,10 @@ ENV/
 # =========================
 # Node / ZKP tooling
 # =========================
+zkp/build/*
+zkp/ptau/*
+!zkp/build/.gitkeep
+!zkp/ptau/.gitkeep
 node_modules/
 npm-debug.log*
 yarn-error.log*
@@ -61,7 +65,7 @@ Thumbs.db
 # Build / Cache
 # =========================
 dist/
-build/
+# build/
 .cache/
 
 # =========================
