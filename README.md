@@ -6,7 +6,9 @@ This project is a simple web frontend + microservices demonstrating the flow of 
 
 ## Project Overview
 
-The UI allows users to simulate the generation of a zero-knowledge proof based on their **age** and **balance** inputs. This proof can then be used to request a JWT token from an Identity Provider (IdP), which in turn grants access to a protected resource without revealing sensitive data.
+The UI allows users to simulate the generation of a zero-knowledge proof based on their age and balance inputs. The underlying mathematical constraint enforced by the proof is that the user must be at least 18 years old and have a balance greater than 1000 units.
+
+This proof can then be used to request a JWT token from an Identity Provider (IdP), which in turn grants access to a protected resource without revealing the actual age or balance values.
 
 In real-world applications, the data for proof generation would come from secure services or databases rather than user input. This demo is intended purely for educational and simulation purposes.
 
