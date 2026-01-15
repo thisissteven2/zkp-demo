@@ -36,7 +36,7 @@ This document explains how to set up and run the Zero-Knowledge Proof (ZKP) demo
 
 Once these steps are done, proceed to the next step.
 
-## Step 2: Run the automated setup script
+## Step 2: Run the Automated Setup Script
 
 Back in the root project folder, run the setup script:
 
@@ -46,26 +46,44 @@ Back in the root project folder, run the setup script:
 
 The script will:
 - Check if the ZKP build artifacts (`build` folder and required files) exist and are valid.
-- If missing or incomplete, it will run the necessary commands to compile the circuit, run the trusted setup, generate keys, and prepare everything for proof generation.
-- Set up and start all backend services.
-    - Enter each service folder (`proof-service`, `verification-service`, `identity-provider`, etc.).
-    - Create and activate a Python virtual environment (if not exists).
-    - Install Python dependencies from `requirements.txt`.
-    - Run the services with `uvicorn` on their respective ports.
-- Open the frontend `index.html` file in your default browser.
+- If missing or incomplete, it will compile the circuit, run the trusted setup, generate keys, and prepare everything for proof generation.
+- Create Python virtual environments for backend services if not present.
+- Install backend service dependencies.
 
-## Step 4: Access the Frontend
+> Note: `setup.sh` does not start the backend services.
 
-After all services are running, the script will open the frontend index.html file directly in your browser.
+## Step 3: Running Backend Services
 
-**Note:** The frontend opens the file path directly (no live server required). Make sure your browser allows JS to make requests to the backend services at `localhost`.
+After the setup completes, start all backend services and open the frontend in your browser by running:
 
-## Manual Notes
+```bash
+./run.sh
+```
 
-- The mathematical constraint enforced is that the user must be at least 18 years old and have a balance greater than 1000. This constraint can be changed by making modifications to the file `./zkp/circuit/age_balance.circom`.
-- Ensure all services run on their respective ports:
+This script will:
+- Activate each service's virtual environment.
+- Start all backend services on their respective ports:
     - Identity Provider service: `5000`
     - Protected Resource service: `5001`
     - Verifier service: `5002`
-    - Proof generation service: `5003`
-- If you make any changes in the zkp circuit or related files, rerun the setup script to rebuild.
+    - Proof Generation service: `5003`
+- Open the frontend `index.html` in your default browser.
+
+## Step 4: Rebuild ZKP Artifacts (After Circuit Changes)
+
+If you make any changes to the ZKP circuit file zkp/circuit/age_balance.circom or related files, run the rebuild script to regenerate the ZKP build artifacts without reinstalling backend dependencies:
+
+```bash
+./rebuild-zkp.sh
+```
+
+This script will:
+- Recompile the circuit.
+- Rerun the trusted setup and key generation steps.
+- Copy the updated verification key to the verifier service folder.
+
+## Additional Notes
+
+- The mathematical constraint enforced is that the user must be at least 18 years old and have a balance greater than 1000. This constraint can be changed by editing `./zkp/circuit/age_balance.circom`.
+- The frontend runs as a static file (`index.html`), so no live server is needed. Make sure your browser allows JS requests to the backend services running on localhost.
+- To stop backend services, kill their running processes or close the terminal windows.

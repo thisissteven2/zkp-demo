@@ -39,8 +39,8 @@ function run_service() {
 # Start backend services
 run_service "proof-service" 5003
 run_service "idp-service" 5000
-run_service "verifier-service" 5001
-run_service "protected-service" 5002
+run_service "verifier-service" 5002
+run_service "protected-service" 5001
 
 # Open frontend in default browser
 FRONTEND_PATH="$SCRIPT_DIR/frontend/index.html"
