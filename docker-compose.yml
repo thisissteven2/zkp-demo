@@ -1,0 +1,12 @@
+services:
+  idp:
+    build: ./idp-service
+    ports: ["5000:5000"]
+
+  verifier:
+    build: ./verifier-service
+    ports: ["6000:6000"]
+
+  protected:
+    build: ./protected-service
+    ports: ["7000:7000"]
