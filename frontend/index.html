@@ -1,0 +1,55 @@
+it still refreshes:
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>ZKP Demo Frontend</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				margin: 40px;
+				max-width: 500px;
+			}
+			label {
+				display: block;
+				margin-top: 15px;
+			}
+			input {
+				width: 100%;
+				padding: 8px;
+				margin-top: 5px;
+			}
+			button {
+				margin-top: 20px;
+				padding: 10px 20px;
+			}
+			pre {
+				background: #eee;
+				padding: 15px;
+				margin-top: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>ZKP Demo Frontend</h1>
+
+		<form id="zkpForm">
+			<label>
+				Age:
+				<input type="number" id="age" name="age" required min="0" />
+			</label>
+			<label>
+				Balance:
+				<input type="number" id="balance" name="balance" required min="0" />
+			</label>
+			<button type="submit">Generate Proof & Access Resource</button>
+		</form>
+
+		<h2>Result</h2>
+		<pre id="result"></pre>
+
+		<script src="app.js"></script>
+	</body>
+</html>

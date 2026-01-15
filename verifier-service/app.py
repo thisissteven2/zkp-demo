@@ -1,11 +1,21 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
 import subprocess
 import json
 import tempfile
 import os
 
 app = FastAPI(title="ZKP Verifier Service")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # ---- Request schema ----
 class ProofRequest(BaseModel):

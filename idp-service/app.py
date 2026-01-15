@@ -1,10 +1,20 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
 import requests
 import time
 from jose import jwt
 
 app = FastAPI(title="Identity Provider (IdP)")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Shared secret with protected-service
 SECRET_KEY = "SUPER_SECRET_IDP_KEY"
@@ -14,12 +24,10 @@ TOKEN_TTL = 60  # seconds
 # Verifier service endpoint
 VERIFIER_URL = "http://127.0.0.1:5002/verify-proof"
 
-
 # Expected request body from user
 class ProofRequest(BaseModel):
     proof: dict
     public: list
-
 
 @app.post("/issue-token")
 def issue_token(req: ProofRequest):

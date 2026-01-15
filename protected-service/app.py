@@ -1,22 +1,34 @@
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 from jose import jwt, JWTError
 import time
 
 app = FastAPI(title="Protected Service")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # MUST match idp-service
 SECRET_KEY = "SUPER_SECRET_IDP_KEY"
 ALGORITHM = "HS256"
 TRUSTED_ISSUER = "idp-service"
 
+class TokenRequest(BaseModel):
+    token: str
 
 @app.post("/access-resource")
-def access_resource(authorization: str = Header(...)):
-    # 1. Check Authorization header format
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid Authorization header")
+def access_resource(req: TokenRequest):
+    token = req.token
 
-    token = authorization.replace("Bearer ", "")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing token")
 
     try:
         # 2. Verify JWT signature
